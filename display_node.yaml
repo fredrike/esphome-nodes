@@ -4,14 +4,14 @@ esphome:
   board: esp32dev
   on_boot:
       - output.turn_off: onboard_led
-   
+
 wifi:
   ssid: "Fredrik_AP"
   password: !secret wifi_password
 
 # Enable logging
 logger:
-  
+
 # Enable Home Assistant API
 api:
   password: !secret api_password
@@ -19,12 +19,6 @@ api:
 ota:
   password: !secret ota_password
 
-
-#i2c:
-#  scl: 5
-#  sda: 6
-#  scan: False
-  
 spi:
   clk_pin: 13
   mosi_pin: 14
@@ -40,89 +34,100 @@ font:
   - file: 'fonts/DroidSansMono.ttf'
     id: temp_font
     size: 22
-    glyphs: 
-      ['&', '@', '!', ',', '.', '"', '%', '(', ')', '+', '-', '_', ':', '°', '0', 
-       '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 
+    glyphs:
+      ['&', '@', '!', ',', '.', '"', '%', '(', ')', '+', '-', '_', ':', '°', '0',
+       '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
        'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
        'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', 'a', 'b', 'c', 'd', 'e', 'f',
        'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-       'u', 'v', 'w', 'x', 'y', 'z',]
+       'u', 'v', 'w', 'x', 'y', 'z','å', 'ä', 'ö', '/']
+
   - file: 'fonts/DejaVuSansMono-Bold.ttf'
     id: status_font
     size: 14
-    glyphs: 
-      ['&', '@', '!', ',', '.', '"', '%', '(', ')', '+', '-', '_', ':', '°', '0', 
-       '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 
+    glyphs:
+      ['&', '@', '!', ',', '.', '"', '%', '(', ')', '+', '-', '_', ':', '°', '0',
+       '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
        'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
        'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', 'a', 'b', 'c', 'd', 'e', 'f',
        'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-       'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ö']
-      
-  - file: fonts/weathericons-regular-webfont.ttf
-    id: thermometer_font
-    size: 24
-    glyphs:
-      ['', # day-sunny 
-       '', # wi-day-cloudy
-       '', # thermometer
-       ]    
-  - file: fonts/weathericons-regular-webfont.ttf
-    id: weather_font_old
-    size: 38
-    glyphs:
-      [ # ' ', 'M', 'o', 'n', 'S', 'a', 't', 'u', 'T', 'e',
-       '', # day-sunny 
-       '', # wi-day-cloudy
-       '', # day-rain
-       '', # cloud
-       '', # rain 
-       '', # thermometer
-       ]
+       'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ä', 'ö', '/']
+
   - file: 'fonts/materialdesignicons-webfont.ttf'
     id: icon_font
     size: 24
     glyphs: [
       '', # mdi-account-heart
-      '', # mdi-thermometer  
+      '', # mdi-thermometer
       '󰅢', # mdi-fire-hydrant
-      '', # mdi-weather-cloudy
-      '', # mdi-weather-fog
-      '', # mdi-weather-partly-cloudy
+      "", # mdi-umbrella
+      "ｲ", # mdi-home-thermometer-outline
+      "ｱ", # mdi-home-thermometer
+      # Wifi
       '冷', # mdi-wifi-strength-outline
       '爛', # mdi-wifi-strength-1
-      '嵐', # mdi-wifi-strength-2  
-      '襤', # mdi-wifi-strength-3  
+      '嵐', # mdi-wifi-strength-2
+      '襤', # mdi-wifi-strength-3
       '蠟', # mdi-wifi-strength-4
-      "",
-      "",
-      "",
-      "",
-      "ｓ",
-      "",
-      "ｎ"
+      # Weather
+      "", # mdi-weather-sunny
+      "", # mdi-weather-night
+      "", # mdi-weather-cloudy
+      "", # mdi-weather-pouring
+      "", # mdi-weather-snowy-rainy
+      "ｓ", # mdi-weather-snowy-heavy
+      "", # mdi-weather-windy-variant
+      "", # mdi-weather-fog
+      "ｎ", # mdi-weather-night-partly-cloudy
+      "", # mdi-weather-partly-cloudy
+      # Moon
+      "ﾁ", # new_moon
+      "ﾄ", # waxing_crecent
+      "ｾ", # first_quarter
+      "ﾅ", # waxing_gibbous
+      "ｿ", # full_moon
+      "ﾃ", # waning_gibbous
+      "ﾀ", # last_quarter
+      "ﾂ", # waning_crescent
+      # Sun
+      "", # mdi-weather-sunset-down
+      "", # mdi-weather-sunset-up
       ]
   - file: 'fonts/materialdesignicons-webfont.ttf'
     id: weather_font
     size: 44
     glyphs: [
       '', # mdi-account-heart
-      '', # mdi-thermometer  
+      '', # mdi-thermometer
       '󰅢', # mdi-fire-hydrant
-      '', # mdi-weather-cloudy
-      '', # mdi-weather-fog
-      '', # mdi-weather-partly-cloudy
+      "", # mdi-umbrella
+      "ｲ", # mdi-home-thermometer-outline
+      # Wifi
       '冷', # mdi-wifi-strength-outline
       '爛', # mdi-wifi-strength-1
-      '嵐', # mdi-wifi-strength-2  
-      '襤', # mdi-wifi-strength-3  
+      '嵐', # mdi-wifi-strength-2
+      '襤', # mdi-wifi-strength-3
       '蠟', # mdi-wifi-strength-4
-      "",
-      "",
-      "",
-      "",
-      "ｓ",
-      "",
-      "ｎ"
+      # Weather
+      "", # mdi-weather-sunny
+      "", # mdi-weather-night
+      "", # mdi-weather-cloudy
+      "", # mdi-weather-pouring
+      "", # mdi-weather-snowy-rainy
+      "ｓ", # mdi-weather-snowy-heavy
+      "", # mdi-weather-windy-variant
+      "", # mdi-weather-fog
+      "ｎ", # mdi-weather-night-partly-cloudy
+      "", # mdi-weather-partly-cloudy
+      # Moon
+      "ﾁ", # new_moon
+      "ﾄ", # waxing_crecent
+      "ｾ", # first_quarter
+      "ﾅ", # waxing_gibbous
+      "ｿ", # full_moon
+      "ﾃ", # waning_gibbous
+      "ﾀ", # last_quarter
+      "ﾂ", # waning_crescent
       ]
 
 
