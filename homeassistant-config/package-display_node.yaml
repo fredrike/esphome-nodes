@@ -1,0 +1,109 @@
+sensor:
+  - platform: moon
+  - platform: template
+    sensors:
+      moon_tpl:
+        entity_id: sensor.moon
+        value_template: >-
+          {% set map = {
+            "new_moon": "ﾁ",
+            "waxing_crecent": "ﾂ",
+            "first_quarter": "ｾ",
+            "waxing_gibbous": "ﾃ",
+            "full_moon": "ｿ",
+            "waning_gibbous": "ﾃ",
+            "last_quarter": "ﾀ",
+            "waning_crescent": "ﾂ"
+          } %}
+          {{- map[states('sensor.moon')] -}}
+  - platform: template
+    sensors:
+      forecast_today:
+        entity_id: sensor.time
+        value_template: >-
+          {% set weather = {
+            "clear-day": "", 
+            "clear-night": "", 
+            "cloudy": "", 
+            "rain": "", 
+            "sleet": "", 
+            "snow": "ｓ", 
+            "wind": "", 
+            "fog": "", 
+            "partly-cloudy-day": "", 
+            "partly-cloudy-night": "ｎ" 
+          } %}
+          {% set base = 'sensor.dark_sky_forecast_' %}
+
+          {{- weather[states('{}icon_{}d'.format(base, 0))] -}};
+          {{- states('{}apparent_temperature'.format(base)) -}}°;
+          {{- states('{}precip_probability_{}d'.format(base, 0))|int -}}
+  - platform: darksky #https://pastebin.com/iX7u4ZSg
+    api_key: !secret darksky_api_key
+    name: dark_sky_forecast
+    scan_interval: '00:10'
+    forecast:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+    monitored_conditions:
+      - icon
+      - temperature
+      - apparent_temperature
+      - temperature_high
+      - temperature_low
+      - precip_probability
+      - precip_intensity
+  - platform: template
+    sensors:
+      forecast:
+        entity_id: sensor.time
+        value_template: >-
+          {% set dow = {
+           0: "Mon",
+           1: "Tue",
+           2: "Wed",
+           3: "Thu",
+           4: "Fri",
+           5: "Sat",
+           6: "Sun"
+          } %}
+
+          {% set weather = {
+            "clear-day": "mdi:weather-sunny",
+            "clear-night": "mdi:weather-night",
+            "cloudy": "mdi:weather-cloudy",
+            "rain": "mdi:weather-pouring",
+            "sleet": "mdi:weather-snowy-rainy",
+            "snow": "mdi:weather-snowy",
+            "wind": "mdi:weather-windy",
+            "fog": "mdi:weather-fog",
+            "partly-cloudy-day": "mdi:weather-partly-cloudy",
+            "partly-cloudy-night": "mdi:weather-night-partly-cloudy"
+          } %}
+          {% set weather = {
+            "clear-day": "", 
+            "clear-night": "", 
+            "cloudy": "", 
+            "rain": "", 
+            "sleet": "", 
+            "snow": "ｓ", 
+            "wind": "", 
+            "fog": "", 
+            "partly-cloudy-day": "", 
+            "partly-cloudy-night": "ｎ" 
+          } %}
+
+          {% set base = 'sensor.dark_sky_forecast_' %}
+
+          {%- for i in [ 1, 2, 3, 4] -%}
+            {{ dow[(now().weekday() + i) % 7]  }};
+            {{- weather[states('{}icon_{}d'.format(base, i))] -}};
+            {{- states('{}daytime_high_temperature_{}d'.format(base, i))|int
+            -}}°/
+            {{- states('{}overnight_low_temperature_{}d'.format(base, i))|int -}}°;
+            {{- states('{}precip_probability_{}d'.format(base, i))|int -}}%
+            {%- if not loop.last %};{% endif %}
+          {%- endfor %}
