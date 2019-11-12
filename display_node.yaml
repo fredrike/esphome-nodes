@@ -219,15 +219,15 @@ display:
       }
 
       // Print inside temperature (from homeassistant sensor)
-      y = 245, x = 90;
+      y = 245, x = 95;
       if (id(inside_temperature).has_state()) {
         it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "ｱ");
-        it.printf(x, y, id(temp_font), TextAlign::BOTTOM_LEFT , "% 3.1f°", id(inside_temperature).state);
+        it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%5.1f°", id(inside_temperature).state);
       }
       // Print outside temperature (from homeassistant sensor)
       if (id(outside_temperature).has_state()) {
         it.print(x, y, id(icon_font), TextAlign::TOP_RIGHT, "ｲ"); 
-        it.printf(x, y, id(temp_font), TextAlign::TOP_LEFT, "% 3.1f°", id(outside_temperature).state);
+        it.printf(x+2, y, id(temp_font), TextAlign::TOP_LEFT, "%5.1f°", id(outside_temperature).state);
       }
 
       // Print consumer
@@ -248,8 +248,8 @@ display:
         for (int i=0; i<4; i++) {
           ESP_LOGI("t", "%d", i);
           for (int j=0; j<4; j++) {
-            if(j == 1) {
-              it.printf(x - 60, y + 28, id(weather_font),
+            if(j == 1) {  // Weather icon.
+              it.printf(x - 60, y + 26, id(weather_font),
                 TextAlign::BASELINE_LEFT,
                 "%s", str.substr(previous, current - previous).c_str());
             } else {
