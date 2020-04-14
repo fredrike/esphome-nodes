@@ -10,6 +10,8 @@ ota_password: ""
 ```
 
 ## Display node
+<img
+src="https://raw.githubusercontent.com/fredrike/esphome-nodes/master/display_node.jpg" width='450px'>
 
 Built using a [4.2inch e-Paper Module](https://www.waveshare.com/wiki/4.2inch_e-Paper_Module) connected to an [E-Paper ESP32 Driver Board](https://www.waveshare.com/wiki/E-Paper_ESP32_Driver_Board).
 
