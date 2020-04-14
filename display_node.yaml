@@ -31,9 +31,9 @@ font:
     id: clock_font
     size: 88
     glyphs: [0, 1, 2, 3, 4, 5, 6, 7 ,8, 9, ':']
-  - file: 'fonts/DroidSansMono.ttf'
+  - file: 'fonts/RobotoMono-Medium.ttf'
     id: temp_font
-    size: 22
+    size: 26
     glyphs:
       ['&', '@', '!', ',', '.', '"', '%', '(', ')', '+', '-', '_', ':', '°', '0',
        '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
@@ -41,9 +41,9 @@ font:
        'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', 'a', 'b', 'c', 'd', 'e', 'f',
        'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
        'u', 'v', 'w', 'x', 'y', 'z','å', 'ä', 'ö', '/']
-  - file: 'fonts/DejaVuSansMono-Bold.ttf'
+  - file: 'fonts/DroidSansMonoBold.ttf'
     id: status_font
-    size: 14
+    size: 16
     glyphs:
       ['&', '@', '!', ',', '.', '"', '%', '(', ')', '+', '-', '_', ':', '°', '0',
        '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
@@ -53,7 +53,7 @@ font:
        'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ä', 'ö', '/']
   - file: 'fonts/materialdesignicons-webfont.ttf'
     id: icon_font
-    size: 24
+    size: 32
     glyphs: [
       '', # mdi-account-heart
       '', # mdi-thermometer
@@ -93,7 +93,7 @@ font:
       ]
   - file: 'fonts/materialdesignicons-webfont.ttf'
     id: weather_font
-    size: 44
+    size: 50
     glyphs: [
       '', # mdi-account-heart
       '', # mdi-thermometer
@@ -149,14 +149,14 @@ display:
 
       it.line(259, -10, 259, 200);it.line(261, 0, 261, 200);it.line(260, 0, 260, 200);
       it.line(0, 200, 259, 200);it.line(0, 201, 261, 201);it.line(0, 202, 260, 202);
-
+      /*
       it.print(125, 120, id(temp_font), TextAlign::BASELINE_CENTER, "HELLO SUNSHINE!");
       it.print(125, 160, id(icon_font), TextAlign::BASELINE_CENTER, "");
       it.print(125, 182, id(temp_font), TextAlign::BASELINE_CENTER, "Lea & Emma"); // 400 - ((400 - 260)/2)
-
+      */
       /* Moon icon */
       if(id(moon_icon).has_state()) {
-        y = 260, x = 240;
+        y = 155, x = 230;
         ESP_LOGI("Moon icon", "%s", id(moon_icon).state.c_str());
         it.printf(x, y, id(weather_font), TextAlign::BASELINE_CENTER, "%s", id(moon_icon).state.c_str());
       }
@@ -193,7 +193,7 @@ display:
         std::size_t current, previous = 0;
         char delim = ';';
         current = str.find(delim);
-        int y = 250, x = 5;
+        int y = 140, x = 5;
         for (int i=0; i<3; i++) {
             if(i == 0) {
               it.printf(x, y, id(weather_font),
@@ -207,10 +207,10 @@ display:
                 "%s", str.substr(previous, current - previous).c_str());
               */
             } else if (i == 2) { // Chance for rain
-              it.printf(x, y + 2, id(icon_font), TextAlign::TOP_LEFT, "");
-              it.printf(x + 25, y + 8, id(status_font),
+              it.printf(x, y + 2, id(icon_font), TextAlign::TOP_LEFT, ""); // Umbrella
+              it.printf(x + 30, y + 10, id(status_font),
                 TextAlign::TOP_LEFT,
-                "%s %%", str.substr(previous, current - previous).c_str());
+                "%s%%", str.substr(previous, current - previous).c_str());
             }
             // y += 100;
             previous = current + 1;
@@ -219,7 +219,7 @@ display:
       }
 
       // Print inside temperature (from homeassistant sensor)
-      y = 245, x = 95;
+      y = 135, x = 102;
       if (id(inside_temperature).has_state()) {
         it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "ｱ");
         it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%5.1f°", id(inside_temperature).state);
@@ -232,7 +232,7 @@ display:
 
       // Print consumer
       if (id(top_consumer).has_state()) {
-        it.printf(0, 295, id(status_font), TextAlign::BOTTOM_LEFT , "Total: %.0f W, top user: %s W", id(sparsnas).state, id(top_consumer).state.c_str());
+        it.printf(0, 295, id(status_font), TextAlign::BOTTOM_LEFT , "Total: %.0f W, %s W", id(sparsnas).state, id(top_consumer).state.c_str());
 
       }
       // it.line(0, 299, 400, 299);
@@ -249,7 +249,7 @@ display:
           ESP_LOGI("t", "%d", i);
           for (int j=0; j<4; j++) {
             if(j == 1) {  // Weather icon.
-              it.printf(x - 60, y + 26, id(weather_font),
+              it.printf(x - 65, y + 25, id(weather_font),
                 TextAlign::BASELINE_LEFT,
                 "%s", str.substr(previous, current - previous).c_str());
             } else {
@@ -259,12 +259,12 @@ display:
                 id(status_font),
                 (j == 0 ? TextAlign::TOP_LEFT : TextAlign::TOP_RIGHT),
                 "%s", str.substr(previous, current - previous).c_str());
-              y += 13;
+              y += 14;
             }
             previous = current + 1;
             current = str.find(delim, previous);
           }
-          y += 8;
+          y += 7;
         }
       }
 output:
