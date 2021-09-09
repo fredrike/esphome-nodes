@@ -107,40 +107,38 @@ sensor:
     update_interval: 180s
   - platform: uptime
     name: "${friendly_name} Uptime Sensor"
-    id: ekorrbo_uptime_raw
+    id: ${node_name}_uptime_raw
     update_interval: 60s
     on_raw_value:
       then:
         - logger.log:
             format: "Raw Value of Uptime sensor: %f, %f"
-            args: ['id(ekorrbo_uptime_raw).raw_state', 'id(ekorrbo_uptime_raw).state']
+            args: ['id(${node_name}_uptime_raw).raw_state', 'id(${node_name}_uptime_raw).state']
             level: INFO
         - text_sensor.template.publish:
             id: ekorrbo_uptime
             state: !lambda |-
-              int seconds = round(id(ekorrbo_uptime_raw).raw_state);
+              int seconds = round(id(${node_name}_uptime_raw).raw_state);
               int days = seconds / (24 * 3600);
               seconds = seconds % (24 * 3600);
               int hours = seconds / 3600;
               seconds = seconds % 3600;
               int minutes = seconds /  60;
               seconds = seconds % 60;
-              if ( days ) {
-                return { (String(days) +"d " + String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
-              } else if ( hours ) {
-                return { (String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
-              } else if ( minutes ) {
-                return { (String(minutes) +"m "+ String(seconds) +"s").c_str() };
-              } else {
-                return { (String(seconds) +"s").c_str() };
-              }
+              return (
+                (days ? String(days) + "d " : "") +
+                (hours ? String(hours) + "h " : "") +
+                (minutes ? String(minutes) + "m " : "") +
+                (String(seconds) + "s") 
+              ).c_str();
   - platform: pulse_counter
     pin: 
       number: D2
-    name: 'Power Meter'
+    name: '${friendly_name} Power Meter'
     update_interval: 20s
-    id: power
+    id: ${node_name}_power
     unit_of_measurement: 'W'
+    device_class: power
     accuracy_decimals: 0
     filters:
       - multiply: 300 # 200 pulse/kWh (60/200*1000)
@@ -149,19 +147,18 @@ sensor:
           send_every: 2
     total:
       unit_of_measurement: 'kWh'
-      name: 'Energy Meter'
+      name: '${friendly_name} Energy Meter'
+      last_reset_type: auto
+      state_class: measurement
+      device_class: energy
       accuracy_decimals: 3
       filters:
         - throttle: 60s
         - heartbeat: 60s
         - multiply: 0.005 # 1/200 (1kWh / 200 pulses per kWh)
-  #- platform: total_daily_energy
-  #  name: "Total Daily Energy"
-  #  power_id: power
 
 text_sensor:
   - platform: template
     name: ${friendly_name} Uptime
-    id: ekorrbo_uptime
+    id: ${node_name}_uptime
     icon: mdi:clock-start
-    # update_interval: 600s
