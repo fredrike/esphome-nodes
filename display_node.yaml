@@ -64,8 +64,7 @@ font:
     glyphs: [
       '󰌪', # mdi-leaf
     ]
-  - file: 'MaterialDesign-Webfont/fonts/materialdesignicons-webfont.ttf'
-    # https://github.com/Templarian/MaterialDesign-Webfont/tree/v5.8.55
+  - file: 'MaterialDesign-Webfont/fonts/materialdesignicons-webfont.ttf' 
     id: icon_font_new
     size: 32
     glyphs: [
@@ -76,18 +75,20 @@ font:
       '󰓣', # swim
       "󰽕", # mdi-home-thermometer-outline
       '󰕊', # umbrella
+      # Sun
+      "", # mdi-weather-sunset-down
+      "", # mdi-weather-sunset-up
     ]
-  - file: 'fonts/materialdesignicons-webfont.ttf'
-    # https://github.com/Templarian/MaterialDesign-Webfont/tree/v4.4.95
+  - file: 'MaterialDesign-Webfont/fonts/materialdesignicons-webfont.ttf' 
     id: wifi_font
     size: 32
     glyphs: [
       # Wifi
-      '冷', # mdi-wifi-strength-outline
-      '爛', # mdi-wifi-strength-1
-      '嵐', # mdi-wifi-strength-2
-      '襤', # mdi-wifi-strength-3
-      '蠟', # mdi-wifi-strength-4
+      '冷', # mdi-wifi-strength-outline
+      '爛', # mdi-wifi-strength-1
+      '嵐', # mdi-wifi-strength-2
+      '襤', # mdi-wifi-strength-3
+      '蠟', # mdi-wifi-strength-4
       ]
   - file: 'fonts/materialdesignicons-webfont.ttf'
     # https://github.com/Templarian/MaterialDesign-Webfont/tree/v4.4.95
@@ -105,17 +106,21 @@ font:
       "", # mdi-weather-fog
       "ｎ", # mdi-weather-night-partly-cloudy
       "", # mdi-weather-partly-cloudy
+    ]
+  - file: 'MaterialDesign-Webfont/fonts/materialdesignicons-webfont.ttf' 
+    id: moon_font
+    size: 50
+    glyphs: [
       # Moon
-      "ｾ", # first_quarter
-      "ｿ", # full_moon
-      "ﾀ", # last_quarter
-      "ﾁ", # new_moon
-      "ﾂ", # waning_crescent
-      "ﾃ", # waning_gibbous
-      "ﾄ", # waxing_crescent
-      "ﾅ", # waxing_gibbous
+      "󰽡", # first_quarter
+      "󰽢", # full_moon
+      "󰽣", # last_quarter
+      "󰽤", # new_moon
+      "󰽥", # waning_crescent
+      "󰽦", # waning_gibbous
+      "󰽧", # waxing_crescent
+      "󰽨", # waxing_gibbous
       ]
-
 
 display:
   - platform: waveshare_epaper
@@ -142,30 +147,30 @@ display:
       if(id(moon_icon).has_state()) {
         y = 155, x = 230;
         ESP_LOGI("Moon icon", "%s", id(moon_icon).state.c_str());
-        it.printf(x, y, id(weather_font), TextAlign::BASELINE_CENTER, "%s", id(moon_icon).state.c_str());
+        it.printf(x, y, id(moon_font), TextAlign::BASELINE_CENTER, "%s", id(moon_icon).state.c_str());
       }
       /* WiFi Signal Strenght */
       if(id(wifisignal).has_state()) {
         x = 398, y = 298;
         if (id(wifisignal).state >= -50) {
             //Excellent
-            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "蠟");
+            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "蠟");
             ESP_LOGI("WiFi", "Exellent");
         } else if (id(wifisignal).state  >= -60) {
             //Good
-            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "襤");
+            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "襤");
             ESP_LOGI("WiFi", "Good");
         } else if (id(wifisignal).state  >= -67) {
             //Fair
-            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "嵐");
+            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "嵐");
             ESP_LOGI("WiFi", "Fair");
         } else if (id(wifisignal).state  >= -70) {
             //Weak
-            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "爛");
+            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "爛");
             ESP_LOGI("WiFi", "Weak");
         } else {
             //Unlikely working signal
-            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "冷");
+            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "冷");
             ESP_LOGI("WiFi", "Unlikely");
         }
       }
