@@ -57,8 +57,17 @@ font:
        'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', 'a', 'b', 'c', 'd', 'e', 'f',
        'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
        'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ä', 'ö', '/']
+  - file: 'fonts/Google_Sans_Bold.ttf'
+    id: chia_font
+    size: 16
+    glyphs:
+      ['&', '@', '!', ',', '.', '"', '%', '(', ')', '+', '-', '_', ':', '°', '0',
+       '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
+       'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+       'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', 'a', 'b', 'c', 'd', 'e', 'f',
+       'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+       'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ä', 'ö', '/']
   - file: 'MaterialDesign-Webfont/fonts/materialdesignicons-webfont.ttf'
-    # https://github.com/Templarian/MaterialDesign-Webfont/tree/v5.8.55
     id: icon_font_small
     size: 22
     glyphs: [
@@ -233,9 +242,37 @@ display:
       }
       
       // Print chia
-      it.print(1, 270, id(icon_font_small), TextAlign::BOTTOM_LEFT, "󰌪");
-      it.printf(20, 270, id(status_font), TextAlign::BOTTOM_LEFT, "%.4f xch", id(chia_balance).state + id(flexpool_balance).state);
-            
+      if(id(chia_balance).has_state() && id(flexpool_balance).has_state()) {
+        it.print(1, 267, id(icon_font_small), TextAlign::BOTTOM_LEFT, "󰌪");
+        if (id(flexpool_update).has_state()) {
+          //it.printf(23, 270, id(chia_font), TextAlign::BOTTOM_LEFT, "%.4f xch, (%s)", id(chia_balance).state + id(flexpool_balance).state, id(flexpool_update).state.c_str());
+          //ESP_LOGI("󰌪", "%s", id(flexpool_update).state.c_str());
+          int seconds = round(id(current_time).now().timestamp - atoi(id(flexpool_last_seen_raw).state.c_str()));
+          int days = seconds / (24 * 3600);
+          seconds = seconds % (24 * 3600);
+          int hours = seconds / 3600;
+          seconds = seconds % 3600;
+          int minutes = seconds /  60;
+          seconds = seconds % 60;
+          ESP_LOGI("󰌪", "%.4f xch (%s ago)", id(chia_balance).state + id(flexpool_balance).state, (
+            (days ? to_string(days) + "d " : "") +
+            (hours ? to_string(hours) + "h " : "") +
+            (minutes ? to_string(minutes) + "m" : "")
+            //+ (to_string(seconds) + "s")
+          ).c_str());
+          it.printf(23, 270, id(chia_font), TextAlign::BOTTOM_LEFT, "%.4f xch (%s ago)", id(chia_balance).state + id(flexpool_balance).state, 
+            (
+              (days ? to_string(days) + "d " : "") +
+              (hours ? to_string(hours) + "h " : "") +
+              (minutes ? to_string(minutes) + "m" : "")
+              //+ (to_string(seconds) + "s")
+            ).c_str()
+          );
+        } else {
+          it.printf(23, 270, id(chia_font), TextAlign::BOTTOM_LEFT, "%.4f xch", id(chia_balance).state + id(flexpool_balance).state);
+        }
+      }
+
       // Print consumer
       if (id(top_consumer).has_state()) {
         it.printf(1, 295, id(status_font), TextAlign::BOTTOM_LEFT , "Total: %.0f W, %s W", id(sparsnas).state, id(top_consumer).state.c_str());
@@ -364,3 +401,16 @@ text_sensor:
   - platform: homeassistant
     id: moon_icon
     entity_id: sensor.moon_tpl
+
+  - platform: homeassistant
+    id: flexpool_payout
+    entity_id: sensor.flexpool_time_to_payout
+    internal: true
+
+  - platform: homeassistant
+    id: flexpool_update
+    entity_id: sensor.flexpool_worker_last_seen
+
+  - platform: homeassistant
+    id: flexpool_last_seen_raw
+    entity_id: sensor.flexpool_worker_last_seen_raw
