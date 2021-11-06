@@ -60,7 +60,7 @@ font:
   - file: 'MaterialDesign-Webfont/fonts/materialdesignicons-webfont.ttf'
     # https://github.com/Templarian/MaterialDesign-Webfont/tree/v5.8.55
     id: icon_font_small
-    size: 32
+    size: 22
     glyphs: [
       '󰌪', # mdi-leaf
     ]
@@ -128,7 +128,7 @@ display:
     rotation: 180°
     # full_update_every: 30
     update_interval: 3600s
-    lambda: |
+    lambda: |-
       int x, y, c;
       ESP_LOGI("display", "Updating..");
 
