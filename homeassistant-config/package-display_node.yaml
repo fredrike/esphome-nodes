@@ -7,14 +7,14 @@ sensor:
         # https://github.com/Templarian/MaterialDesign-Webfont/tree/v4.4.95
         value_template: >-
           {% set map = {
-            "first_quarter": "ｾ",
-            "full_moon": "ｿ",
-            "last_quarter": "ﾀ",
-            "new_moon": "ﾁ",
-            "waning_crescent": "ﾂ",
-            "waning_gibbous": "ﾃ",
-            "waxing_crescent": "ﾄ",
-            "waxing_gibbous": "ﾅ",
+            "first_quarter": "󰽡",
+            "full_moon": "󰽢",
+            "last_quarter": "󰽣",
+            "new_moon": "󰽤",
+            "waning_crescent": "󰽥",
+            "waning_gibbous": "󰽦",
+            "waxing_crescent": "󰽧",
+            "waxing_gibbous": "󰽨",
           } %}
           {{- map[states('sensor.moon')] -}}
   - platform: rest
@@ -37,16 +37,16 @@ sensor:
         unique_id: tpl_forecast_today
         value_template: >-
           {% set weather = {
-            "clear-day": "",
-            "clear-night": "",
-            "cloudy": "",
-            "rain": "",
-            "sleet": "",
-            "snow": "ｓ",
-            "wind": "",
-            "fog": "",
-            "partly-cloudy-day": "",
-            "partly-cloudy-night": "ｎ"
+            "clear-day": "󰖙",
+            "clear-night": "󰖔",
+            "cloudy": "󰖐",
+            "rain": "󰖖",
+            "sleet": "󰼵",
+            "snow": "󰼴",
+            "wind": "󰖞",
+            "fog": "󰖑",
+            "partly-cloudy-day": "󰖕",
+            "partly-cloudy-night": "󰼱"
           } %}
           {% set base = 'sensor.dark_sky_forecast_' %}
 
@@ -76,13 +76,13 @@ sensor:
       forecast:
         value_template: >-
           {% set dow = {
-           0: "Mon",
-           1: "Tue",
-           2: "Wed",
-           3: "Thu",
-           4: "Fri",
-           5: "Sat",
-           6: "Sun"
+           0: "Mån",
+           1: "Tis",
+           2: "Ons",
+           3: "Tor",
+           4: "Fre",
+           5: "Lör",
+           6: "Sön"
           } %}
 
           {% set weather = {
@@ -98,16 +98,16 @@ sensor:
             "partly-cloudy-night": "mdi:weather-night-partly-cloudy"
           } %}
           {% set weather = {
-            "clear-day": "",
-            "clear-night": "",
-            "cloudy": "",
-            "rain": "",
-            "sleet": "",
-            "snow": "ｓ",
-            "wind": "",
-            "fog": "",
-            "partly-cloudy-day": "",
-            "partly-cloudy-night": "ｎ"
+            "clear-day": "󰖙",
+            "clear-night": "󰖔",
+            "cloudy": "󰖐",
+            "rain": "󰖖",
+            "sleet": "󰼵",
+            "snow": "󰼴",
+            "wind": "󰖞",
+            "fog": "󰖑",
+            "partly-cloudy-day": "󰖕",
+            "partly-cloudy-night": "󰼱"
           } %}
 
           {% set base = 'sensor.dark_sky_forecast_' %}
