@@ -85,36 +85,35 @@ font:
       "󰽕", # mdi-home-thermometer-outline
       '󰕊', # umbrella
       # Sun
-      "", # mdi-weather-sunset-down
-      "", # mdi-weather-sunset-up
+      "󰖛", # mdi-weather-sunset-down
+      "󰖜", # mdi-weather-sunset-up
     ]
   - file: 'MaterialDesign-Webfont/fonts/materialdesignicons-webfont.ttf' 
     id: wifi_font
     size: 32
     glyphs: [
       # Wifi
-      '冷', # mdi-wifi-strength-outline
-      '爛', # mdi-wifi-strength-1
-      '嵐', # mdi-wifi-strength-2
-      '襤', # mdi-wifi-strength-3
-      '蠟', # mdi-wifi-strength-4
+      '󰤟', # mdi-wifi-strength-1
+      '󰤢', # mdi-wifi-strength-2
+      '󰤥', # mdi-wifi-strength-3
+      '󰤨', # mdi-wifi-strength-4
+      '󰤫', # mdi-wifi-strength-alert-outline
       ]
-  - file: 'fonts/materialdesignicons-webfont.ttf'
-    # https://github.com/Templarian/MaterialDesign-Webfont/tree/v4.4.95
+  - file: 'MaterialDesign-Webfont/fonts/materialdesignicons-webfont.ttf' 
     id: weather_font
     size: 50
     glyphs: [
       # Weather
-      "", # mdi-weather-sunny
-      "", # mdi-weather-night
-      "", # mdi-weather-cloudy
-      "", # mdi-weather-pouring
-      "", # mdi-weather-snowy-rainy
-      "ｓ", # mdi-weather-snowy-heavy
-      "", # mdi-weather-windy-variant
-      "", # mdi-weather-fog
-      "ｎ", # mdi-weather-night-partly-cloudy
-      "", # mdi-weather-partly-cloudy
+      "󰖙", # mdi-weather-sunny
+      "󰖔", # mdi-weather-night
+      "󰖐", # mdi-weather-cloudy
+      "󰖖", # mdi-weather-pouring
+      "󰼵", # mdi-weather-snowy-rainy
+      "󰼴", # mdi-weather-snowy-heavy
+      "󰖞", # mdi-weather-windy-variant
+      "󰖑", # mdi-weather-fog
+      "󰼱", # mdi-weather-night-partly-cloudy
+      "󰖕", # mdi-weather-partly-cloudy
     ]
   - file: 'MaterialDesign-Webfont/fonts/materialdesignicons-webfont.ttf' 
     id: moon_font
@@ -163,23 +162,23 @@ display:
         x = 398, y = 298;
         if (id(wifisignal).state >= -50) {
             //Excellent
-            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "蠟");
+            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "󰤨");
             ESP_LOGI("WiFi", "Exellent");
         } else if (id(wifisignal).state  >= -60) {
             //Good
-            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "襤");
+            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "󰤥");
             ESP_LOGI("WiFi", "Good");
         } else if (id(wifisignal).state  >= -67) {
             //Fair
-            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "嵐");
+            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "󰤢");
             ESP_LOGI("WiFi", "Fair");
         } else if (id(wifisignal).state  >= -70) {
             //Weak
-            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "爛");
+            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "󰤟");
             ESP_LOGI("WiFi", "Weak");
         } else {
             //Unlikely working signal
-            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "冷");
+            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "󰤫");
             ESP_LOGI("WiFi", "Unlikely");
         }
       }
