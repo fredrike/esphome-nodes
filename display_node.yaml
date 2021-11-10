@@ -281,7 +281,9 @@ light:
     output: onboard_led
 
 time:
-  - platform: homeassistant
+  #- platform: homeassistant
+  - platform: sntp
+    # id: sntp_time
     id: current_time
     timezone: Europe/Stockholm
     on_time:
