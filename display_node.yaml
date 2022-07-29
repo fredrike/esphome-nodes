@@ -86,6 +86,7 @@ font:
       '󰽔', # mdi-home-thermometer
       '󰧿', # mdi-lighthouse
       '󰟑', # home-automation
+      '󰮧', # mdi-home-variant-outline
       '󰂒',  # beach
       '󰓣', # swim
       "󰽕", # mdi-home-thermometer-outline
@@ -157,6 +158,7 @@ display:
 
       it.line(259, -10, 259, 200);it.line(261, 0, 261, 200);it.line(260, 0, 260, 200);
       it.line(0, 200, 259, 200);it.line(0, 201, 261, 201);it.line(0, 202, 260, 202);
+      it.line(0, 201, 500, 201); //it.line(0, 201, 261, 201);it.line(0, 202, 260, 202);
 
       /* Moon icon */
       if(id(moon_icon).has_state()) {
@@ -237,19 +239,19 @@ display:
       y = 245, x = 40;
       // Print ekorrbo temp
       if (id(ekorrbo_temperature).has_state()) {
-        it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT, "%5.1f°", id(ekorrbo_temperature).state);
-        it.print(x, y-6, id(icon_font_new), TextAlign::BOTTOM_RIGHT, "󰟑");
+        it.printf(x+1, y, id(temp_font), TextAlign::BOTTOM_LEFT, "%5.1f°", id(ekorrbo_temperature).state);
+        it.print(x, y-6, id(icon_font_new), TextAlign::BOTTOM_RIGHT, "󰮧");
       }
       x = 165;
       if (id(tallholmen_temperature).has_state()) {
         // Print tallholmen temp
-        it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT, "%5.1f°", id(tallholmen_temperature).state);
+        it.printf(x+1, y, id(temp_font), TextAlign::BOTTOM_LEFT, "%5.1f°", id(tallholmen_temperature).state);
         it.print(x, y-6, id(icon_font_new), TextAlign::BOTTOM_RIGHT, "󰓣");
       }
       x += 165 - 40;
       if (id(pool_temperature).has_state()) {
         // Print pool temp
-        it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT, "%5.1f°", id(pool_temperature).state);
+        it.printf(x+1, y, id(temp_font), TextAlign::BOTTOM_LEFT, "%5.1f°", id(pool_temperature).state);
         it.print(x, y-6, id(icon_font_new), TextAlign::BOTTOM_RIGHT, "󱩟");
       }
       
@@ -293,7 +295,7 @@ display:
         std::size_t current, previous = 0;
         char delim = ';';
         current = str.find(delim);
-        int x = 340, y = 4;
+        int x = 340, y = 2;
         for (int i=0; i<4; i++) {
           //ESP_LOGI("t", "%d", i);
           for (int j=0; j<4; j++) {
@@ -312,7 +314,7 @@ display:
             previous = current + 1;
             current = str.find(delim, previous);
           }
-          y += 2;
+          //y += 2;
         }
       }
 
