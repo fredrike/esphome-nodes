@@ -6,8 +6,13 @@ esphome:
       - output.turn_off: onboard_led
 
 wifi:
-  ssid: "Fredrik_AP"
-  password: !secret wifi_password
+  networks:
+  - ssid: "Erlandssons IOT"
+    password: !secret wifi_iot_password
+    hidden: true
+    priority: 256
+  - ssid: "Fredrik_AP"
+    password: !secret wifi_password
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Display_node Fallback Hotspot"
@@ -17,6 +22,7 @@ captive_portal:
 
 # Enable logging
 logger:
+  level: info
 
 # Enable Home Assistant API
 api:
@@ -84,6 +90,7 @@ font:
       '󰓣', # swim
       "󰽕", # mdi-home-thermometer-outline
       '󰕊', # umbrella
+      '󱩟', # mdi-pool-thermometer
       # Sun
       "󰖛", # mdi-weather-sunset-down
       "󰖜", # mdi-weather-sunset-up
@@ -154,7 +161,7 @@ display:
       /* Moon icon */
       if(id(moon_icon).has_state()) {
         y = 155, x = 230;
-        ESP_LOGI("Moon icon", "%s", id(moon_icon).state.c_str());
+        ESP_LOGI("Moon", "%s", id(moon_icon).state.c_str());
         it.printf(x, y, id(moon_font), TextAlign::BASELINE_CENTER, "%s", id(moon_icon).state.c_str());
       }
       /* WiFi Signal Strenght */
@@ -163,23 +170,23 @@ display:
         if (id(wifisignal).state >= -50) {
             //Excellent
             it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "󰤨");
-            ESP_LOGI("WiFi", "Exellent");
+            ESP_LOGI("WiFi", "Exellent, 󰤨");
         } else if (id(wifisignal).state  >= -60) {
             //Good
             it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "󰤥");
-            ESP_LOGI("WiFi", "Good");
+            ESP_LOGI("WiFi", "Good, 󰤥");
         } else if (id(wifisignal).state  >= -67) {
             //Fair
             it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "󰤢");
-            ESP_LOGI("WiFi", "Fair");
+            ESP_LOGI("WiFi", "Fair, 󰤢");
         } else if (id(wifisignal).state  >= -70) {
             //Weak
             it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "󰤟");
-            ESP_LOGI("WiFi", "Weak");
+            ESP_LOGI("WiFi", "Weak, 󰤟");
         } else {
             //Unlikely working signal
             it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "󰤫");
-            ESP_LOGI("WiFi", "Unlikely");
+            ESP_LOGI("WiFi", "Unlikely, 󰤫");
         }
       }
 
@@ -239,12 +246,18 @@ display:
         it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT, "%5.1f°", id(tallholmen_temperature).state);
         it.print(x, y-6, id(icon_font_new), TextAlign::BOTTOM_RIGHT, "󰓣");
       }
+      x += 165 - 40;
+      if (id(pool_temperature).has_state()) {
+        // Print pool temp
+        it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT, "%5.1f°", id(pool_temperature).state);
+        it.print(x, y-6, id(icon_font_new), TextAlign::BOTTOM_RIGHT, "󱩟");
+      }
       
       // Print chia
       if(id(chia_balance).has_state() && id(flexpool_balance).has_state()) {
         it.print(1, 267, id(icon_font_small), TextAlign::BOTTOM_LEFT, "󰌪");
         if (id(flexpool_update).has_state()) {
-          //it.printf(23, 270, id(chia_font), TextAlign::BOTTOM_LEFT, "%.4f xch, (%s)", id(chia_balance).state + id(flexpool_balance).state, id(flexpool_update).state.c_str());
+          //it.printf(23, 270, id(chia_font), TextAlign::BOTTOM_LEFT, "%.2f xch, (%s)", id(chia_balance).state + id(flexpool_balance).state, id(flexpool_update).state.c_str());
           //ESP_LOGI("󰌪", "%s", id(flexpool_update).state.c_str());
           int seconds = round(id(current_time).now().timestamp - atoi(id(flexpool_last_seen_raw).state.c_str()));
           int days = seconds / (24 * 3600);
@@ -253,13 +266,13 @@ display:
           seconds = seconds % 3600;
           int minutes = seconds /  60;
           seconds = seconds % 60;
-          ESP_LOGI("󰌪", "%.4f xch (%s ago)", id(chia_balance).state + id(flexpool_balance).state, (
+          ESP_LOGI("󰌪", "%.2f xch (%s ago)", id(chia_balance).state + id(flexpool_balance).state, (
             (days ? to_string(days) + "d " : "") +
             (hours ? to_string(hours) + "h " : "") +
             (minutes ? to_string(minutes) + "m" : "")
             //+ (to_string(seconds) + "s")
           ).c_str());
-          it.printf(23, 270, id(chia_font), TextAlign::BOTTOM_LEFT, "%.4f xch (%s ago)", id(chia_balance).state + id(flexpool_balance).state, 
+          it.printf(23, 270, id(chia_font), TextAlign::BOTTOM_LEFT, "%.2f xch (%s ago)", id(chia_balance).state + id(flexpool_balance).state, 
             (
               (days ? to_string(days) + "d " : "") +
               (hours ? to_string(hours) + "h " : "") +
@@ -268,16 +281,10 @@ display:
             ).c_str()
           );
         } else {
-          it.printf(23, 270, id(chia_font), TextAlign::BOTTOM_LEFT, "%.4f xch", id(chia_balance).state + id(flexpool_balance).state);
+          it.printf(23, 270, id(chia_font), TextAlign::BOTTOM_LEFT, "%.2f xch", id(chia_balance).state + id(flexpool_balance).state);
         }
       }
 
-      // Print consumer
-      if (id(top_consumer).has_state()) {
-        it.printf(1, 295, id(status_font), TextAlign::BOTTOM_LEFT , "Total: %.0f W, %s W", id(sparsnas).state, id(top_consumer).state.c_str());
-
-      }
-      // it.line(0, 299, 400, 299);
 
       // std::string str = "mon:cloud:12.1:30%:tue:rain:10.2:40%:wed:sunny:18.0:0%:thu:snow:-12.2:10%";
       if(id(weather_forecast).has_state()) {
@@ -288,15 +295,14 @@ display:
         current = str.find(delim);
         int x = 340, y = 4;
         for (int i=0; i<4; i++) {
-          ESP_LOGI("t", "%d", i);
+          //ESP_LOGI("t", "%d", i);
           for (int j=0; j<4; j++) {
             if(j == 1) {  // Weather icon.
               it.printf(x - 65, y + 25, id(weather_font),
                 TextAlign::BASELINE_LEFT,
                 "%s", str.substr(previous, current - previous).c_str());
             } else {
-              ESP_LOGD("weather","%dx%d %s", (j % 1 ? 270 : 320), x,
-                str.substr(previous, current - previous).c_str());
+              ESP_LOGD("Weather","%s", str.substr(previous, current - previous).c_str());
               it.printf((j == 0 ? x - 10 : 390), y,
                 id(status_font),
                 (j == 0 ? TextAlign::TOP_LEFT : TextAlign::TOP_RIGHT),
@@ -309,6 +315,14 @@ display:
           y += 2;
         }
       }
+
+      // Print consumer
+      if (id(top_consumer).has_state()) {
+        it.printf(1, 295, id(status_font), TextAlign::BOTTOM_LEFT , "Total: %.0f W, %s W", id(sparsnas).state, id(top_consumer).state.c_str());
+          ESP_LOGI("󰉁", "Total: %.0f W, %s W", id(sparsnas).state, id(top_consumer).state.c_str());
+      }
+      // it.line(0, 299, 400, 299);
+
 output:
   - platform: gpio
     id: onboard_led
@@ -355,7 +369,12 @@ sensor:
     internal: true
 
   - platform: homeassistant
-    entity_id: sensor.sparsnas_w
+    id: pool_temperature
+    entity_id: sensor.pool_temperature
+    internal: true
+
+  - platform: homeassistant
+    entity_id: sensor.qpyjyywb_import_power
     id: sparsnas
     internal: true
 
