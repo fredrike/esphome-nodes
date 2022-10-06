@@ -22,7 +22,7 @@ captive_portal:
 
 # Enable logging
 logger:
-  level: info
+  level: debug
 
 # Enable Home Assistant API
 api:
@@ -242,6 +242,7 @@ display:
         it.printf(x+1, y, id(temp_font), TextAlign::BOTTOM_LEFT, "%5.1f°", id(ekorrbo_temperature).state);
         it.print(x, y-6, id(icon_font_new), TextAlign::BOTTOM_RIGHT, "󰮧");
       }
+      /*
       x = 165;
       if (id(tallholmen_temperature).has_state()) {
         // Print tallholmen temp
@@ -254,6 +255,7 @@ display:
         it.printf(x+1, y, id(temp_font), TextAlign::BOTTOM_LEFT, "%5.1f°", id(pool_temperature).state);
         it.print(x, y-6, id(icon_font_new), TextAlign::BOTTOM_RIGHT, "󱩟");
       }
+      */
       
       // Print chia
       if(id(chia_balance).has_state() && id(flexpool_balance).has_state()) {
@@ -324,6 +326,13 @@ display:
           ESP_LOGI("󰉁", "Total: %.0f W, %s W", id(sparsnas).state, id(top_consumer).state.c_str());
       }
       // it.line(0, 299, 400, 299);
+      
+      it.graph(239, 201, id(nordpool_graph));
+      // Print consumer
+      if (id(nordpool_se4).has_state()) {
+        it.printf(239, 252, id(chia_font), TextAlign::TOP_LEFT , "SE4: %.02f kr/kWh", id(nordpool_se4).state);
+          ESP_LOGI("󰉁", "SE4: %.02f", id(nordpool_se4).state);
+      }
 
 output:
   - platform: gpio
@@ -348,6 +357,13 @@ time:
       - seconds: 0
         then:
           - component.update: epaper
+
+graph:
+  - id: nordpool_graph
+    sensor: nordpool_se4
+    duration: 32h
+    width: 160
+    height: 50
 
 sensor:
   - platform: homeassistant
@@ -393,6 +409,11 @@ sensor:
   - platform: homeassistant
     entity_id: sensor.flexpool_current_balance
     id: flexpool_balance
+    internal: true
+
+  - platform: homeassistant
+    entity_id: sensor.nordpool_kwh_se4_sek_3_10_025
+    id: nordpool_se4
     internal: true
 
   - platform: wifi_signal
