@@ -1,0 +1,70 @@
+esphome:
+  name: ble-proxy-home
+  friendly_name: "BLE Proxy @ Home"
+  on_boot:
+    - output.turn_off: onboard_led
+
+esp32:
+  board: wemos_d1_mini32
+  framework:
+    type: esp-idf
+
+wifi:
+  # use_address: ble-proxy.local
+  networks:
+    - ssid: "Erlandssons IOT"
+      password: !secret wifi_iot_password
+      hidden: true
+      priority: 256
+    - ssid: "Fredrik_AP"
+      password: !secret wifi_password
+    - ssid: "ConsidKarlskrona"
+      password: "WhiskeyOnTheRocks"
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Display_node Fallback Hotspot"
+    password: "N9sWXNGtarny"
+
+captive_portal:
+
+# Enable logging
+logger:
+  level: debug
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "ruEVs+YesuLameOanehpAmy1zYrNI2VTahhP2wnpwQ4="
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+esp32_ble_tracker:
+  scan_parameters:
+    # We currently use the defaults to ensure Bluetooth
+    # can co-exist with WiFi In the future we may be able to
+    # enable the built-in coexistence logic in ESP-IDF
+    active: true
+
+bluetooth_proxy:
+  active: true
+
+output:
+  - platform: gpio
+    id: onboard_led
+    pin:
+      number: GPIO2
+      ignore_strapping_warning: true
+      inverted: False
+
+light:
+  - platform: binary
+    name: "Onboard LED"
+    output: onboard_led
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal Sensor"
+    id: wifisignal
+    update_interval: 60s

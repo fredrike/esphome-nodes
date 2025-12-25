@@ -1,0 +1,69 @@
+wifi:
+  #use_address: display_node.local
+  networks:
+  - ssid: "Erlandssons IOT"
+    password: !secret wifi_iot_password
+    hidden: true
+    priority: 256
+  - ssid: "Fredrik_AP"
+    password: !secret wifi_password
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "${friendly_name}"
+    password: "N9sWXNGtarny"
+
+captive_portal:
+
+# Enable logging
+logger:
+  level: debug
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "ruEVs+YesuLameOanehpAmy1zYrNI2VTahhP2wnpwQ4=" 
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+text_sensor:
+  - platform: template
+    name: ${friendly_name} Uptime
+    id: ${node_name}_uptime
+    icon: mdi:clock-start
+
+sensor:
+  - platform: wifi_signal
+    name: "${friendly_name} WiFi Signal Sensor"
+    update_interval: 180s
+  - platform: uptime
+    name: "${friendly_name} Uptime Sensor"
+    id: ${node_name}_uptime_raw
+    update_interval: 60s
+    on_raw_value:
+      then:
+        - logger.log:
+            format: "Raw Value of Uptime sensor: %f, %f"
+            args: ['id(${node_name}_uptime_raw).raw_state', 'id(${node_name}_uptime_raw).state']
+            level: INFO
+        - text_sensor.template.publish:
+            id: ekorrbo_uptime
+            state: !lambda |-
+              int seconds = round(id(${node_name}_uptime_raw).raw_state);
+              int days = seconds / (24 * 3600);
+              seconds = seconds % (24 * 3600);
+              int hours = seconds / 3600;
+              seconds = seconds % 3600;
+              int minutes = seconds /  60;
+              seconds = seconds % 60;
+              if ( days ) {
+                return { (String(days) +"d " + String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
+              } else if ( hours ) {
+                return { (String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
+              } else if ( minutes ) {
+                return { (String(minutes) +"m "+ String(seconds) +"s").c_str() };
+              } else {
+                return { (String(seconds) +"s").c_str() };
+              }
+
