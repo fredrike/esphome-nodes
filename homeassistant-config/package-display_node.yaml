@@ -1,0 +1,123 @@
+sensor:
+  - platform: moon
+  - platform: template
+    sensors:
+      moon_tpl:
+        unique_id: moon_tpl 
+        # https://github.com/Templarian/MaterialDesign-Webfont/tree/v4.4.95
+        value_template: >-
+          {% set map = {
+            "first_quarter": "󰽡",
+            "full_moon": "󰽢",
+            "last_quarter": "󰽣",
+            "new_moon": "󰽤",
+            "waning_crescent": "󰽥",
+            "waning_gibbous": "󰽦",
+            "waxing_crescent": "󰽧",
+            "waxing_gibbous": "󰽨",
+          } %}
+          {{- map[states('sensor.moon')] -}}
+  - platform: rest
+    resource: 'https://sunrisesunsetmap.com/api/data.php?lat=56.183115843801986&lon=15.535498212096513&country=SE'
+    name: moon_rest
+    json_attributes:
+      - moon
+    value_template: '{{ value_json["moon"]["phase"] }}'
+  - platform: template
+    sensors:
+      moon_rise:
+        unique_id: sensor_moon_rise
+        value_template: '{{ state_attr("sensor.moon_rest", "moon").get("rise", {}).get("time") }}'
+      moon_set:
+        unique_id: sensor_moon_set
+        value_template: '{{ state_attr("sensor.moon_rest", "moon").get("set", {}).get("time") }}'
+  - platform: template
+    sensors:
+      forecast_today:
+        unique_id: tpl_forecast_today
+        value_template: >-
+          {% set weather = {
+            "clear-day": "󰖙",
+            "clear-night": "󰖔",
+            "cloudy": "󰖐",
+            "rain": "󰖖",
+            "sleet": "󰼵",
+            "snow": "󰼴",
+            "wind": "󰖞",
+            "fog": "󰖑",
+            "partly-cloudy-day": "󰖕",
+            "partly-cloudy-night": "󰼱"
+          } %}
+          {% set base = 'sensor.dark_sky_forecast_' %}
+
+          {{- weather[states('{}icon_{}d'.format(base, 0))] -}};
+          {{- states('{}apparent_temperature'.format(base)) -}}°;
+          {{- states('{}precip_probability_{}d'.format(base, 0))|int -}}
+  - platform: darksky #https://pastebin.com/iX7u4ZSg
+    api_key: !secret darksky_api_key
+    name: dark_sky_forecast
+    scan_interval: '00:10'
+    forecast:
+      - 0
+      - 1
+      - 2
+      - 3
+      - 4
+    monitored_conditions:
+      - icon
+      - temperature
+      - apparent_temperature
+      - temperature_high
+      - temperature_low
+      - precip_probability
+      - precip_intensity
+  - platform: template
+    sensors:
+      forecast:
+        value_template: >-
+          {% set dow = {
+           0: "Mån",
+           1: "Tis",
+           2: "Ons",
+           3: "Tor",
+           4: "Fre",
+           5: "Lör",
+           6: "Sön"
+          } %}
+
+          {% set weather = {
+            "clear-day": "mdi:weather-sunny",
+            "clear-night": "mdi:weather-night",
+            "cloudy": "mdi:weather-cloudy",
+            "rain": "mdi:weather-pouring",
+            "sleet": "mdi:weather-snowy-rainy",
+            "snow": "mdi:weather-snowy",
+            "wind": "mdi:weather-windy",
+            "fog": "mdi:weather-fog",
+            "partly-cloudy-day": "mdi:weather-partly-cloudy",
+            "partly-cloudy-night": "mdi:weather-night-partly-cloudy"
+          } %}
+          {% set weather = {
+            "clear-day": "󰖙",
+            "clear-night": "󰖔",
+            "cloudy": "󰖐",
+            "rain": "󰖖",
+            "sleet": "󰼵",
+            "snow": "󰼴",
+            "wind": "󰖞",
+            "fog": "󰖑",
+            "partly-cloudy-day": "󰖕",
+            "partly-cloudy-night": "󰼱"
+          } %}
+
+          {% set base = 'sensor.dark_sky_forecast_' %}
+
+          {%- for i in [ 1, 2, 3, 4] -%}
+            {{ dow[(now().weekday() + i) % 7]  }};
+            {{- weather[states('{}icon_{}d'.format(base, i))] -}};
+            {{- states('{}daytime_high_temperature_{}d'.format(base, i))|int
+            -}}°/
+            {{- states('{}overnight_low_temperature_{}d'.format(base, i))|int -}}°;
+            {{- states('{}precip_probability_{}d'.format(base, i))|int -}}%
+            {%- if not loop.last %};{% endif %}
+          {%- endfor %}

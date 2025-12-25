@@ -1,0 +1,568 @@
+esphome:
+  name: display-node
+  platform: ESP32
+  board: esp32dev
+  on_boot:
+      - output.turn_off: onboard_led
+
+wifi:
+  use_address: display_node.local
+  networks:
+  - ssid: "Erlandssons IOT"
+    password: !secret wifi_iot_password
+    hidden: true
+    priority: 256
+  - ssid: "Fredrik_AP"
+    password: !secret wifi_password
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Display_node Fallback Hotspot"
+    password: "N9sWXNGtarny"
+
+captive_portal:
+
+# Enable logging
+logger:
+  level: debug
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "ruEVs+YesuLameOanehpAmy1zYrNI2VTahhP2wnpwQ4=" 
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+spi:
+  clk_pin: 13
+  mosi_pin: 14
+
+# s= '@!"%()+,-_.:°0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz.'
+# print([','.join(_) for _ in s])
+
+
+esp32_ble_tracker:
+  scan_parameters:
+    # We currently use the defaults to ensure Bluetooth
+    # can co-exist with WiFi In the future we may be able to
+    # enable the built-in coexistence logic in ESP-IDF
+    active: true
+
+bluetooth_proxy:
+  active: true
+
+font:
+  - file: 'fonts/Google_Sans_Bold.ttf'
+    id: clock_font
+    size: 90
+    glyphs: ["0", "1", "2", "3", "4", "5", "6", "7" ,"8", "9", ':']
+  - file: 'fonts/Google_Sans_Medium.ttf'
+    id: tiny_font
+    size: 15
+    glyphs: ["0", "1", "2", "3", "4", "5", "6", "7" ,"8", "9",  '.']
+  - file: 'fonts/Google_Sans_Medium.ttf'
+    id: temp_font
+    size: 32
+    glyphs:
+      ['&', '@', '!', ',', '.', '"', '%', '(', ')', '+', '-', '_', ':', '°', '0',
+       '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
+       'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+       'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', 'a', 'b', 'c', 'd', 'e', 'f',
+       'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+       'u', 'v', 'w', 'x', 'y', 'z','å', 'ä', 'ö', '/']
+  - file: 'fonts/Google_Sans_Bold.ttf'
+    id: status_font
+    size: 18
+    glyphs:
+      ['&', '@', '!', ',', '.', '"', '%', '(', ')', '+', '-', '_', ':', '°', '0',
+       '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
+       'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+       'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', 'a', 'b', 'c', 'd', 'e', 'f',
+       'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+       'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ä', 'ö', '/']
+  - file: 'fonts/Google_Sans_Bold.ttf'
+    id: chia_font
+    size: 16
+    glyphs:
+      ['&', '@', '!', ',', '.', '"', '%', '(', ')', '+', '-', '_', ':', '°', '0',
+       '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
+       'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+       'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', 'a', 'b', 'c', 'd', 'e', 'f',
+       'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+       'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ä', 'ö', '/']
+  - file: 'MaterialDesign-Webfont/fonts/materialdesignicons-webfont.ttf'
+    id: icon_font_small
+    size: 22
+    glyphs: [
+      '󰌪', # mdi-leaf
+    ]
+  - file: 'MaterialDesign-Webfont/fonts/materialdesignicons-webfont.ttf' 
+    id: icon_font_new
+    size: 32
+    glyphs: [
+      '󰽔', # mdi-home-thermometer
+      '󰧿', # mdi-lighthouse
+      '󰟑', # home-automation
+      '󰮧', # mdi-home-variant-outline
+      '󰂒',  # beach
+      '󰓣', # swim
+      "󰽕", # mdi-home-thermometer-outline
+      '󰕊', # umbrella
+      '󱩟', # mdi-pool-thermometer
+      # Sun
+      "󰖛", # mdi-weather-sunset-down
+      "󰖜", # mdi-weather-sunset-up
+    ]
+  - file: 'MaterialDesign-Webfont/fonts/materialdesignicons-webfont.ttf' 
+    id: wifi_font
+    size: 32
+    glyphs: [
+      # Wifi
+      '󰤟', # mdi-wifi-strength-1
+      '󰤢', # mdi-wifi-strength-2
+      '󰤥', # mdi-wifi-strength-3
+      '󰤨', # mdi-wifi-strength-4
+      '󰤫', # mdi-wifi-strength-alert-outline
+      ]
+  - file: 'MaterialDesign-Webfont/fonts/materialdesignicons-webfont.ttf' 
+    id: weather_font
+    size: 50
+    glyphs: [
+      # Weather
+      "󰖙", # mdi-weather-sunny
+      "󰖔", # mdi-weather-night
+      "󰖐", # mdi-weather-cloudy
+      "󰖖", # mdi-weather-pouring
+      "󰼵", # mdi-weather-snowy-rainy
+      "󰼴", # mdi-weather-snowy-heavy
+      "󰖞", # mdi-weather-windy-variant
+      "󰖑", # mdi-weather-fog
+      "󰼱", # mdi-weather-night-partly-cloudy
+      "󰖕", # mdi-weather-partly-cloudy
+    ]
+  - file: 'MaterialDesign-Webfont/fonts/materialdesignicons-webfont.ttf' 
+    id: moon_font
+    size: 50
+    glyphs: [
+      # Moon
+      "󰽡", # first_quarter
+      "󰽢", # full_moon
+      "󰽣", # last_quarter
+      "󰽤", # new_moon
+      "󰽥", # waning_crescent
+      "󰽦", # waning_gibbous
+      "󰽧", # waxing_crescent
+      "󰽨", # waxing_gibbous
+      ]
+
+display:
+  - platform: waveshare_epaper
+    id: epaper
+    cs_pin: 15
+    busy_pin: 25
+    reset_pin: 26
+    dc_pin: 27
+    model: 4.20in
+    rotation: 180°
+    # full_update_every: 30
+    update_interval: 3600s
+    lambda: |-
+      int x, y, c;
+      ESP_LOGI("display", "Updating..");
+
+      /* Print time in HH:MM format */
+      it.strftime(125, -10, id(clock_font), TextAlign::TOP_CENTER, "%H:%M", id(current_time).now());
+
+      it.line(259, -10, 259, 200);it.line(261, 0, 261, 200);it.line(260, 0, 260, 200);
+      it.line(0, 200, 259, 200);it.line(0, 201, 261, 201);it.line(0, 202, 260, 202);
+      it.line(0, 201, 500, 201); //it.line(0, 201, 261, 201);it.line(0, 202, 260, 202);
+
+      /* Moon icon */
+      if(id(moon_icon).has_state()) {
+        y = 155, x = 230;
+        ESP_LOGI("Moon", "%s", id(moon_icon).state.c_str());
+        it.printf(x, y, id(moon_font), TextAlign::BASELINE_CENTER, "%s", id(moon_icon).state.c_str());
+      }
+      /* WiFi Signal Strenght */
+      if(id(wifisignal).has_state()) {
+        x = 398, y = 298;
+        if (id(wifisignal).state >= -50) {
+            //Excellent
+            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "󰤨");
+            ESP_LOGI("WiFi", "Exellent, 󰤨");
+        } else if (id(wifisignal).state  >= -60) {
+            //Good
+            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "󰤥");
+            ESP_LOGI("WiFi", "Good, 󰤥");
+        } else if (id(wifisignal).state  >= -67) {
+            //Fair
+            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "󰤢");
+            ESP_LOGI("WiFi", "Fair, 󰤢");
+        } else if (id(wifisignal).state  >= -70) {
+            //Weak
+            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "󰤟");
+            ESP_LOGI("WiFi", "Weak, 󰤟");
+        } else {
+            //Unlikely working signal
+            it.print(x, y, id(wifi_font), TextAlign::BOTTOM_RIGHT, "󰤫");
+            ESP_LOGI("WiFi", "Unlikely, 󰤫");
+        }
+      }
+
+      // Current weather
+      if(id(weather_forecast_today).has_state()) {
+        std::string str = id(weather_forecast_today).state;
+        ESP_LOGI("Weather", "%s", str.c_str());
+        std::size_t current, previous = 0;
+        char delim = ';';
+        current = str.find(delim);
+        int y = 140, x = 5;
+        for (int i=0; i<3; i++) {
+            if(i == 0) {
+              it.printf(x, y-2, id(weather_font),
+                TextAlign::BASELINE_LEFT,
+                "%s", str.substr(previous, current - previous).c_str());
+            } else if (i == 1) {
+              ESP_LOGD("weather","%dx%d %s", (i % 1 ? 270 : 320), x,
+                str.substr(previous, current - previous).c_str());
+              /* it.printf(y, x, id(status_font),
+                TextAlign::TOP_LEFT,
+                "%s", str.substr(previous, current - previous).c_str());
+              */
+            } else if (i == 2) { // Chance for rain
+              it.printf(x, y + 2, id(icon_font_new), TextAlign::TOP_LEFT, "󰕊"); // Umbrella
+              it.printf(x + 30, y + 10, id(status_font),
+                TextAlign::TOP_LEFT,
+                "%s%%", str.substr(previous, current - previous).c_str());
+            }
+            // y += 100;
+            previous = current + 1;
+            current = str.find(delim, previous);
+        }
+      }
+
+      // Print inside temperature (from homeassistant sensor)
+      y = 138, x = 110;
+      if (id(inside_temperature_).has_state()) {
+        it.print(x, y-6, id(icon_font_new), TextAlign::BOTTOM_RIGHT, "󰽔");
+        it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%5.1f°", id(inside_temperature_).state);
+      }
+      y += 40;
+      // Print outside temperature (from homeassistant sensor)
+      if (id(outside_temperature).has_state()) {
+        it.print(x, y-6, id(icon_font_new), TextAlign::BOTTOM_RIGHT, "󰽕"); 
+        it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT, "%5.1f°", id(outside_temperature).state);
+      }
+      y = 245, x = 40;
+      // Print ekorrbo temp
+      if (id(ekorrbo_temperature).has_state()) {
+        //ESP_LOGI("Ekorrbo", %s", id(ekorrbo_temperature).state.c_str());
+        it.printf(x+1, y, id(temp_font), TextAlign::BOTTOM_LEFT, "%5.1f°", id(ekorrbo_temperature).state);
+        it.print(x, y-6, id(icon_font_new), TextAlign::BOTTOM_RIGHT, "󰮧");
+      }
+      /*
+      x = 165;
+      if (id(tallholmen_temperature).has_state()) {
+        // Print tallholmen temp
+        it.printf(x+1, y, id(temp_font), TextAlign::BOTTOM_LEFT, "%5.1f°", id(tallholmen_temperature).state);
+        it.print(x, y-6, id(icon_font_new), TextAlign::BOTTOM_RIGHT, "󰓣");
+      }
+      x += 165 - 40;
+      x = 40;
+      if (id(emma_temperature).has_state()) {
+        // Print pool temp
+        //it.printf(x+1, y, id(temp_font), TextAlign::BOTTOM_LEFT, "%5.1f°", id(emma_temperature).state);
+        //it.print(x, y-6, id(icon_font_new), TextAlign::BOTTOM_RIGHT, "󱩟");
+      }
+      */
+      
+      // Print chia
+      if(id(chia_balance).has_state() && id(flexpool_balance).has_state()) {
+        it.print(1, 265, id(icon_font_small), TextAlign::BOTTOM_LEFT, "󰌪");
+        if (id(flexpool_update).has_state()) {
+          //it.printf(23, 270, id(chia_font), TextAlign::BOTTOM_LEFT, "%.2f xch, (%s)", id(chia_balance).state + id(flexpool_balance).state, id(flexpool_update).state.c_str());
+          //ESP_LOGI("󰌪", "%s", id(flexpool_update).state.c_str());
+          int seconds = round(id(current_time).now().timestamp - atoi(id(flexpool_last_seen_raw).state.c_str()));
+          if (seconds > (24 * 3600))
+            it.printf(23, 270, id(chia_font), TextAlign::BOTTOM_LEFT, "%.2f xch (offline)", id(chia_balance).state + id(flexpool_balance).state);
+          else {
+          int days = seconds / (24 * 3600);
+          seconds = seconds % (24 * 3600);
+          int hours = seconds / 3600;
+          seconds = seconds % 3600;
+          int minutes = seconds /  60;
+          seconds = seconds % 60;
+          ESP_LOGI("󰌪", "%.2f xch (%s ago)", id(chia_balance).state + id(flexpool_balance).state, (
+            (days ? to_string(days) + "d " : "") +
+            (hours ? to_string(hours) + "h " : "") +
+            (minutes ? to_string(minutes) + "m" : "")
+            //+ (to_string(seconds) + "s")
+          ).c_str());
+          it.printf(23, 265, id(chia_font), TextAlign::BOTTOM_LEFT, "%.2f", id(chia_balance).state + id(flexpool_balance).state); /*, 
+            (
+              (days ? to_string(days) + "d " : "") +
+              (hours ? to_string(hours) + "h " : "") +
+              (minutes ? to_string(minutes) + "m" : "")
+              //+ (to_string(seconds) + "s")
+            ).c_str()
+          );*/
+          }
+        } else {
+          it.printf(23, 265, id(chia_font), TextAlign::BOTTOM_LEFT, "%.2f !", id(chia_balance).state + id(flexpool_balance).state);
+        }
+      }
+
+
+      // std::string str = "mon:cloud:12.1:30%:tue:rain:10.2:40%:wed:sunny:18.0:0%:thu:snow:-12.2:10%";
+      if(id(weather_forecast).has_state()) {
+        std::string str = id(weather_forecast).state;
+        ESP_LOGI("Weather", "%s", str.c_str());
+        std::size_t current, previous = 0;
+        char delim = ';';
+        current = str.find(delim);
+        int x = 340, y = 2;
+        for (int i=0; i<4; i++) {
+          //ESP_LOGI("t", "%d", i);
+          for (int j=0; j<4; j++) {
+            if(j == 1) {  // Weather icon.
+              it.printf(x - 65, y + 25, id(weather_font),
+                TextAlign::BASELINE_LEFT,
+                "%s", str.substr(previous, current - previous).c_str());
+            } else {
+              ESP_LOGD("Weather","%s", str.substr(previous, current - previous).c_str());
+              it.printf((j == 0 ? x - 10 : 390), y,
+                id(status_font),
+                (j == 0 ? TextAlign::TOP_LEFT : TextAlign::TOP_RIGHT),
+                "%s", str.substr(previous, current - previous).c_str());
+              y += 16;
+            }
+            previous = current + 1;
+            current = str.find(delim, previous);
+          }
+          //y += 2;
+        }
+      }
+
+      // Print consumer
+      if (id(top_consumer).has_state()) {
+        it.printf(1, 295, id(status_font), TextAlign::BOTTOM_LEFT , "Total: %.0f W, %s W", id(sparsnas).state, id(top_consumer).state.c_str());
+          ESP_LOGI("󰉁", "Total: %.0f W, %s W", id(sparsnas).state, id(top_consumer).state.c_str());
+      }
+      // it.line(0, 299, 400, 299);
+      
+      //it.graph(239, 201, id(nordpool_graph));
+      // Print consumer
+      if (id(nordpool_se4).has_state()) {
+        it.printf(239, 252, id(chia_font), TextAlign::TOP_LEFT , "SE4: %.02f kr/kWh", id(nordpool_se4).state);
+          ESP_LOGI("󰉁", "SE4: %.02f", id(nordpool_se4).state);
+      }
+  
+      // Nordpool graph
+      if( !(id(current_time).now().is_valid() && id(se4_today).has_state() && id(se4_tomorrow).has_state()))
+        return;
+      int currentHour = id(current_time).now().hour;//13;
+      //currentHour = 2;
+      float values[49];
+      std::string today = id(se4_today).state;
+      static std::string tomorrow = id(se4_tomorrow).state;
+      static std::string yesterday;
+      ESP_LOGD("SE4", "%s | %s | %s", yesterday.c_str(), today.c_str(), tomorrow.c_str());
+      std::string str = today.substr(1, today.length()-2);
+      if (tomorrow.length() > 2) {
+        str += ", ";
+        yesterday = str;
+        str += tomorrow.substr(1, tomorrow.length()-2);
+      } else if(yesterday.length() > 2) {
+        str = yesterday;
+        str += today.substr(1, today.length()-2);
+        // 4.098, 3.926, 3.928, 3.715, 3.66, 3.671, 3.831, 3.814, 3.996, 4.364, 4.452, 4.706, 4.741, 4.427, 4.476, 4.588, 4.93, 5.644, 5.863, 5.627, 5.235, 4.572, 4.415, 4.175,  | [3.82, 3.305, 3.272, 3.272, 3.272, 3.775, 5.219, 6.885, 7.255, 6.839, 6.891, 6.781, 6.68, 6.582, 6.899, 7.286, 7.432, 7.825, 7.434, 6.76, 6.46, 5.441, 4.618, 2.727] | []
+        //str = "4.098, 3.926, 3.928, 3.715, 3.66, 3.671, 3.831, 3.814, 3.996, 4.364, 4.452, 4.706, 4.741, 4.427, 4.476, 4.588, 4.93, 5.644, 5.863, 5.627, 5.235, 4.572, 4.415, 4.175, 3.82, 3.305, 3.272, 3.272, 3.272, 3.775, 5.219, 6.885, 7.255, 6.839, 6.891, 6.781, 6.68, 6.582, 6.899, 7.286, 7.432, 7.825, 7.434, 6.76, 6.46, 5.441, 4.618, 2.727";
+        currentHour += 24;
+      }
+      ESP_LOGD("SE4", "%s", str.c_str());
+      char delim = ',';
+      int current = str.find(delim);
+      int previous = 0;
+      float max=-999, min=999;
+      int maxRead = 0;
+      for(int i=0; i<48; i++) {
+        values[i] = atof(str.substr(previous, current - previous).c_str());
+        if (current < 0) {maxRead=i; break;}
+        previous = current + 2;
+        current = str.find(delim, previous);
+        if  (values[i] > max)
+          max = values[i];
+        if (values[i] < min)
+          min = values[i];
+      }
+      //Normalize based on min/max
+      ESP_LOGD("SE4", "%d %f %f %f", currentHour, min, max, (max-min)*0.2);
+      int length = 48;
+      x = 110+48;
+      y = 202 + length; //+50;
+      it.printf(x-2, y+6, id(tiny_font), TextAlign::BOTTOM_RIGHT, "%d", (int)floor(min));
+      it.printf(x-2, y-length-3, id(tiny_font), TextAlign::TOP_RIGHT, "%d", (int)ceil(max));
+      it.line(x, y, 400, y);
+      for (int i=0; i<48; i++) {
+        int height = round(length*(values[i]-floor(min))/(ceil(max)-floor(min)));
+        ESP_LOGD("SE4", "%02d %s %.2f %d %d %d", i%24, (i==currentHour)? "+" : " ", values[i], height, y, y+height);
+        if (i <= maxRead) {
+          if (i == currentHour)
+            it.filled_rectangle(x, y - height, 6, height);
+          else
+            it.rectangle(x, y - height, 6, height);
+        }
+        if (i == 23) // Draw a line at midnight
+          it.line(x+6, y-length, x+6, y+6);
+        if (!((i+1)%12)) //Draw a line at noon
+          it.line(x+6, y, x+6, y+4);
+        if (!((i+1)%6)) //Draw a line every 6th hour
+          it.line(x+6, y, x+6, y+2);
+        x += 5;
+      }
+
+      
+
+output:
+  - platform: gpio
+    id: onboard_led
+    pin:
+      number: 2
+      inverted: False
+
+light:
+  - platform: binary
+    name: "Onboard LED"
+    output: onboard_led
+
+time:
+  #- platform: homeassistant
+  - platform: sntp
+    # id: sntp_time
+    id: current_time
+    timezone: Europe/Stockholm
+    on_time:
+      # Every 1 minutes
+      - seconds: 0
+        then:
+          - component.update: epaper
+
+graph:
+  - id: nordpool_graph
+    sensor: nordpool_se4
+    duration: 32h
+    width: 160
+    height: 50
+    
+one_wire:
+  - platform: gpio
+    pin: GPIO32
+
+sensor:
+  - platform: dallas_temp
+    address: 0x6b00000437dd8c28
+    # address: 0x6b00000437dd8c28
+    name: Inne
+    id: inside_temperature
+#    name: emma
+#    id: emma_temperature
+
+  - platform: homeassistant
+    id: inside_temperature_
+    entity_id: sensor.vit_inne_temperature
+    internal: true
+
+  - platform: homeassistant
+    id: outside_temperature
+    entity_id: sensor.ute_temperature
+    internal: true
+
+  - platform: homeassistant
+    id: ekorrbo_temperature
+    entity_id: sensor.minut_ekorrbo_temperature
+    internal: true
+
+  - platform: homeassistant
+    id: tallholmen_temperature
+    entity_id: sensor.badtemp_tallholmen
+    internal: true
+
+  - platform: homeassistant
+    id: pool_temperature
+    entity_id: sensor.pool_temperature
+    internal: true
+
+  - platform: homeassistant
+    entity_id: sensor.qpyjyywb_import_power
+    id: sparsnas
+    internal: true
+
+  - platform: homeassistant
+    entity_id: sensor.dark_sky_precip_probability
+    id: precip_probability
+    internal: true
+
+  - platform: homeassistant
+    entity_id: sensor.chia_current_balance
+    id: chia_balance
+    internal: true
+
+  - platform: homeassistant
+    entity_id: sensor.flexpool_current_balance
+    id: flexpool_balance
+    internal: true
+
+  - platform: homeassistant
+    entity_id: sensor.nordpool_kwh_se4_sek_3_10_025
+    id: nordpool_se4
+    internal: true
+
+  - platform: wifi_signal
+    name: "WiFi Signal Sensor"
+    id: wifisignal
+    update_interval: 60s
+
+text_sensor:
+  - platform: homeassistant
+    id: se4_today
+    entity_id: sensor.nordpool_kwh_se4_sek_3_10_025
+    attribute: today
+  - platform: homeassistant
+    id: se4_tomorrow
+    entity_id: sensor.nordpool_kwh_se4_sek_3_10_025
+    attribute: tomorrow
+
+  - platform: homeassistant
+    id: top_consumer
+    entity_id: sensor.iotawatt_top_consumer
+    internal: true
+
+  - platform: homeassistant
+    name: forecast
+    id: weather_forecast
+    entity_id: sensor.forecast
+    internal: true
+
+  - platform: homeassistant
+    name: forecast
+    id: weather_forecast_today
+    entity_id: sensor.forecast_today
+    internal: true
+
+  - platform: homeassistant
+    id: moon_icon
+    entity_id: sensor.moon_tpl
+
+  - platform: homeassistant
+    id: flexpool_payout
+    entity_id: sensor.flexpool_time_to_payout
+    internal: true
+
+  - platform: homeassistant
+    id: flexpool_update
+    entity_id: sensor.flexpool_worker_last_seen
+
+  - platform: homeassistant
+    id: flexpool_last_seen_raw
+    entity_id: sensor.flexpool_worker_last_seen_raw

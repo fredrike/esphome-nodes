@@ -1,0 +1,74 @@
+esphome:
+  name: light_sensor
+  platform: ESP8266
+  board: d1_mini
+  on_boot:
+    priority: 800.0
+    then: 
+      - output.turn_off: gnd
+      - delay: 20ms
+
+wifi:
+  ssid: "Fredrik_AP"
+  power_save_mode: LIGHT
+  password: !secret wifi_password
+
+# Enable logging
+logger:
+  
+# Enable Home Assistant API
+api:
+  password: !secret api_password
+
+ota:
+  password: !secret ota_password
+
+i2c:
+  scl: D7
+  sda: D6
+  scan: True
+
+output:
+  - platform: gpio
+    id: onboard_led
+    pin:
+      number: D4
+      inverted: True
+
+  - platform: gpio
+    pin:
+      number: D8
+      mode: OUTPUT
+    id: gnd 
+
+
+light:
+  - platform: binary
+    name: "Onboard LED"
+    output: onboard_led
+    
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal Sensor"
+    update_interval: 60s
+
+  - platform: tsl2561
+    name: "TSL2561 Ambient Light"
+    id: amb_light
+    update_interval: 60s
+
+
+binary_sensor:
+  - platform: gpio
+    id: light_int
+    pin:
+      number: D5
+      mode: INPUT
+      inverted: True
+    name: "Light changed"
+    on_state:
+      then:
+        - logger.log: 
+            format: "Light changed to %s"
+            args: [ 'id(light_int).state' ]
+        - component.update: amb_light
